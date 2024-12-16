@@ -30,3 +30,6 @@ build/
 
 # Local development settings
 .DS_Store
+
+# Data folder
+data/
