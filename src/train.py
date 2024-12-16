@@ -1,18 +1,19 @@
 import torch
 from torch.utils.data import DataLoader
 from typing import List, Tuple
+from src.algos import AlgoType
 
 
 def train_model(
-    model: torch.nn.Module,
+    algo: AlgoType,
     train_data: torch.utils.data.Dataset,
     test_data: torch.utils.data.Dataset,
     num_epochs: int,
     device: torch.device,
-    criterion: torch.nn.Module,
-    optimizer: torch.optim.Optimizer,
     batch_size: int,
 ) -> Tuple[List[float], List[float]]:
+    model = algo.net
+    
     # Training loop
     train_losses = []
     test_accuracies = []
@@ -27,13 +28,8 @@ def train_model(
             images = images.to(device)
             labels = labels.to(device)
 
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
+            # Use Backprop's learn method
+            loss, _ = algo.learn(images, labels)
             train_losses.append(loss.item())
 
         # Test accuracy
