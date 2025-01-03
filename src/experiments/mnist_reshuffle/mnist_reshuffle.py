@@ -13,11 +13,9 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 
 # Get the absolute path to the parent directory of 'src'
-project_root = os.path.abspath(os.path.join(os.getcwd(), '..', '..'))
+project_root = os.path.abspath(os.path.join(os.getcwd(), '..', '..', '..'))
 sys.path.append(project_root)
 
-from src.algos import BP
-from src.nets import MLP, LSTM
 from src.train import train_model
 from src.utils import shuffle_labels, plot_results, load_model, load_algo
 from src.config import Config
@@ -30,7 +28,6 @@ args = parser.parse_args()
 # Load config file
 with open(args.config, 'r') as f:
     config = yaml.safe_load(f)
-
 
 # Initialize config from dict
 config = Config.from_dict(config)
@@ -100,4 +97,4 @@ np.save(f'{output_dir}/all_train_losses.npy', np.array(all_train_losses))
 np.save(f'{output_dir}/all_test_accuracies.npy', np.array(all_test_accuracies))
 logging.debug(f"Saved training losses and test accuracies to {output_dir}")
 
-plot_results(all_train_losses, all_test_accuracies, config.num_shuffles, output_dir, config.model_type)
+plot_results(all_train_losses, all_test_accuracies, config.num_shuffles, output_dir, config.exp_desc)

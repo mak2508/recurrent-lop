@@ -12,6 +12,7 @@ class Config:
     model_type: Literal["MLP", "LSTM"] = "MLP"
 
     # Training parameters
+    algo: Literal["BP", "CBP"] = "BP"
     num_epochs: int = 2
     batch_size: int = 6000
     learning_rate: float = 0.01
@@ -27,6 +28,7 @@ class Config:
             hidden_size=config_dict.get('model', {}).get('hidden_size', cls.hidden_size),
             dropout_rate=config_dict.get('model', {}).get('dropout_rate', cls.dropout_rate),
             model_type=config_dict.get('model', {}).get('model_type', cls.model_type),
+            algo=config_dict.get('training', {}).get('algo', cls.algo),
             num_epochs=config_dict.get('training', {}).get('num_epochs', cls.num_epochs),
             batch_size=config_dict.get('training', {}).get('batch_size', cls.batch_size),
             learning_rate=config_dict.get('training', {}).get('learning_rate', cls.learning_rate),

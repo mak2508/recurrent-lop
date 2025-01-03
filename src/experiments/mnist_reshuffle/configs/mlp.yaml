@@ -15,4 +15,4 @@ training:
   num_shuffles: 3  # Number of times to repeat training with different label shufflings
   to_perturb: False
 
-exp_desc: "mnist_reshuffle"  # Experiment description for output directory naming
+exp_desc: "mlp"  # Experiment description for output directory naming

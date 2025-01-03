@@ -6,7 +6,7 @@ def plot_results(
     all_test_accuracies: List[List[float]],
     num_shuffles: int,
     save_path: Optional[str] = None,
-    model_name: str = ""
+    exp_desc: str = ""
 ) -> None:
     """
     Plot training losses and test accuracies across multiple runs.
@@ -31,7 +31,7 @@ def plot_results(
     for i in range(1, num_shuffles):
         plt.axvline(x=i*len(combined_losses)//num_shuffles, color='red', linestyle='--', alpha=0.5)
     if save_path:
-        plt.savefig(f'{save_path}_{model_name}_loss.png')
+        plt.savefig(f'{save_path}/loss.png')
     plt.close(fig_loss)
 
     # Accuracy figure
@@ -43,7 +43,7 @@ def plot_results(
     for i in range(1, num_shuffles):
         plt.axvline(x=i*len(combined_accuracies)//num_shuffles, color='red', linestyle='--', alpha=0.5)
     if save_path:
-        plt.savefig(f'{save_path}_{model_name}_accuracy.png')
+        plt.savefig(f'{save_path}/accuracy.png')
     plt.close(fig_acc)
 
     # Combined figure
@@ -65,5 +65,5 @@ def plot_results(
 
     plt.tight_layout()
     if save_path:
-        plt.savefig(f'{save_path}_{model_name}_combined.png')
+        plt.savefig(f'{save_path}/combined.png')
     plt.show()

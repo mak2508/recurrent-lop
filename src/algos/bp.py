@@ -13,7 +13,7 @@ class Backprop(AlgoType):
     def __init__(
         self,
         net: torch.nn.Module,
-        step_size: float = 0.001,
+        learning_rate: float = 0.001,
         loss: str = 'nll',
         opt: str = 'adam',
         weight_decay: float = 0.0,
@@ -28,9 +28,9 @@ class Backprop(AlgoType):
 
         # define the optimizer
         if opt == 'sgd':
-            self.opt = optim.SGD(self.net.parameters(), lr=step_size, weight_decay=weight_decay)
+            self.opt = optim.SGD(self.net.parameters(), lr=learning_rate, weight_decay=weight_decay)
         elif opt == 'adam':
-            self.opt = optim.Adam(self.net.parameters(), lr=step_size, weight_decay=weight_decay)
+            self.opt = optim.Adam(self.net.parameters(), lr=learning_rate, weight_decay=weight_decay)
 
         # define the loss function
         self.loss = loss
