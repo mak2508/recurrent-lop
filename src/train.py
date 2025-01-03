@@ -3,6 +3,9 @@ from torch.utils.data import DataLoader
 from typing import List, Tuple
 from src.algos import AlgoType
 
+import logging
+# Get the root logger but don't modify its level
+logger = logging.getLogger()
 
 def train_model(
     algo: AlgoType,
@@ -48,7 +51,7 @@ def train_model(
         accuracy = 100 * correct / total
         test_accuracies.append(accuracy)
 
-        print(
+        logging.info(
             f"Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Test Accuracy: {accuracy:.2f}%"
         )
         model.train()

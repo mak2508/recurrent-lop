@@ -1,0 +1,18 @@
+# Model Configuration
+model:
+  model_type: "MLP"  # Model type (MLP or LSTM)
+  input_size: 784 # 28 * 28 for mnist images
+  hidden_size: 25
+  num_classes: 10
+  dropout_rate: 0.0
+
+# Training Configuration
+training:
+  algo: "BP" # BP or CBP (yet to be implemented)
+  num_epochs: 2  # Set to 25 for full training
+  batch_size: 6000
+  learning_rate: 0.01
+  num_shuffles: 3  # Number of times to repeat training with different label shufflings
+  to_perturb: False
+
+exp_desc: "mnist_reshuffle"  # Experiment description for output directory naming
