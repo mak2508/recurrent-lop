@@ -1,5 +1,5 @@
 from .algo_type import AlgoType
-from .bp import BP
+from .bp import Backprop as BP
 
 __all__ = ["AlgoType", "BP"]
 

@@ -58,8 +58,5 @@ class Backprop(AlgoType):
 
     def _perturb(self):
         with torch.no_grad():
-            for i in range(int(len(self.net.layers)/2)+1):
-                self.net.layers[i * 2].bias +=\
-                    torch.empty(self.net.layers[i * 2].bias.shape, device=self.device).normal_(mean=0, std=self.perturb_scale)
-                self.net.layers[i * 2].weight +=\
-                    torch.empty(self.net.layers[i * 2].weight.shape, device=self.device).normal_(mean=0, std=self.perturb_scale)
+            for param in self.net.parameters():
+                param.data += torch.empty_like(param).normal_(mean=0, std=self.perturb_scale)
