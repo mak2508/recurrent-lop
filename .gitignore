@@ -1,3 +1,6 @@
+# Ignore csv files like datasets
+*.csv
+
 # Python virtual environment
 .venv/
 venv/

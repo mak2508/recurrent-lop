@@ -1,0 +1,9 @@
+torch
+numpy
+pandas
+tensorflow
+pyyaml
+argparse
+logging
+matplotlib
+wget
