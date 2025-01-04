@@ -76,4 +76,4 @@ def train_model(
         )
         model.train()
 
-    return train_losses, train_accuracies, test_accuracies
+    return train_losses, test_accuracies

@@ -8,8 +8,9 @@ import logging
 from datetime import datetime
 from torch.utils.data import Dataset
 import pandas as pd
-import tensorflow as tf
 import subprocess
+
+from transformers import AutoTokenizer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -69,12 +70,11 @@ def load_language_data(dataset_file, config):
     df = df[df['lang'].isin(config.languages)]
     df = df[df['sentence'].str.strip() != '']
 
-    # Tokenizer setup
-    tokenizer = tf.keras.preprocessing.text.Tokenizer(num_words=config.vocab_limit, oov_token="<OOV>")
-    tokenizer.fit_on_texts(df['sentence'].tolist())
-    vocab_size = min(len(tokenizer.word_index) + 1, config.vocab_limit)
+    # Load Hugging Face tokenizer
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    vocab_size = len(tokenizer)
 
-    logging.info(f"Tokenizer built with vocab_size: {vocab_size}")
+    logging.info(f"Tokenizer initialized with vocab_size: {vocab_size}")
 
     # Prepare data for each language
     X_data, Y_data = [], []
@@ -82,7 +82,7 @@ def load_language_data(dataset_file, config):
         lang_df = df[df['lang'] == lang].sample(n=config.sentences_per_class, random_state=42)
         if len(lang_df) < config.sentences_per_class:
             raise ValueError(f"Not enough data for language: {lang}")
-        
+
         X_data.extend(lang_df['sentence'].tolist())
         Y_data.extend([idx] * config.sentences_per_class)
 
@@ -93,26 +93,30 @@ def load_language_data(dataset_file, config):
     np.random.shuffle(combined)
     X_data, Y_data = zip(*combined)
 
-    # Convert sentences to sequences and pad
-    X_data_seq = tokenizer.texts_to_sequences(X_data)
-    X_data_seq = [[min(w, vocab_size - 1) for w in seq] for seq in X_data_seq]
-    X_data_padded = tf.keras.preprocessing.sequence.pad_sequences(X_data_seq, maxlen=config.max_length, padding='post')
-    Y_data = np.array(Y_data)
+    # Tokenize and pad sequences
+    logging.info("Tokenizing and padding sentences...")
+    encoded_inputs = tokenizer(
+        list(X_data),
+        max_length=config.max_length,
+        padding="max_length",
+        truncation=True,
+        return_tensors="pt"
+    )
+    X_data_padded = encoded_inputs["input_ids"]
+    Y_data = torch.tensor(Y_data, dtype=torch.long)
 
     # Split into training and testing sets
     train_size = config.train_sentences_per_class * len(config.languages)
     X_train, Y_train = X_data_padded[:train_size], Y_data[:train_size]
     X_test, Y_test = X_data_padded[train_size:], Y_data[train_size:]
 
-    # Convert to PyTorch tensors
-    X_train_t = torch.tensor(X_train, dtype=torch.long).to(device)
-    Y_train_t = torch.tensor(Y_train, dtype=torch.long).to(device)
-    X_test_t = torch.tensor(X_test, dtype=torch.long).to(device)
-    Y_test_t = torch.tensor(Y_test, dtype=torch.long).to(device)
+    # Move to the correct device
+    X_train, Y_train = X_train.to(device), Y_train.to(device)
+    X_test, Y_test = X_test.to(device), Y_test.to(device)
 
     # Create datasets
-    train_dataset = LanguageDataset(X_train_t, Y_train_t)
-    test_dataset = LanguageDataset(X_test_t, Y_test_t)
+    train_dataset = LanguageDataset(X_train, Y_train)
+    test_dataset = LanguageDataset(X_test, Y_test)
 
     logging.info("Datasets created with shuffled splits.")
     return train_dataset, test_dataset, vocab_size
