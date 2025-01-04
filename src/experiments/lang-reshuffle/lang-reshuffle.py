@@ -114,7 +114,7 @@ def load_language_data(dataset_file, config):
 train_dataset, test_dataset, vocab_size = load_language_data(dataset_file, config)
 logging.info("Data preparation complete.")
 
-# Load GRU model
+# Load model and algorithm
 model = load_model(config)
 algo = load_algo(model, config)
 

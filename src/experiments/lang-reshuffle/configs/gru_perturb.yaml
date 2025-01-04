@@ -1,11 +1,12 @@
 # Model Configuration
 model:
   model_type: "GRU"
-  input_size: 10000      # Vocabulary size (input dimension)
-  hidden_size: 32        # Hidden size (used as embedding dimension)
+  input_size: 0          # Vocabulary size; will be updated by the tokenizer
+  embedding_dim: 64      # Embedding dimension to be used by embedding layer
+  hidden_size: 64        # Hidden size to be used by sequential model
   num_layers: 1          # Number of GRU layers
   num_classes: 10        # Number of languages
-  vocab_limit: 10000     # Vocabulary limit (maximum number of words in the vocabulary)
+  vocab_limit: 0         # Vocabulary limit (maximum number of words in the vocabulary)
   max_length: 50         # Maximum sequence length
   dropout_rate: 0.0      # Dropout rate for regularization
 
@@ -13,18 +14,18 @@ model:
 training:
   algo: "BP"             # Backprop
   num_epochs: 30         # Number of epochs
-  batch_size: 128        # Batch size
+  batch_size: 512        # Batch size
   learning_rate: 0.01    # Learning rate
   num_tasks: 150         # Number of tasks to repeat
   num_shuffles: 150      # Number of tasks to repeat with shuffling
   to_perturb: True       # Set up the boolean for perturbing
-  perturb_scale: 0.01    # Set up the perturb scale
+  perturb_scale: 0.001   # Set up the perturb scale
 
 # Dataset Configuration
 languages: ['spa', 'por', 'ita', 'fra', 'ron', 'deu', 'cmn', 'rus', 'hin', 'ara'] # List of languages
-train_sentences_per_class: 900
-test_sentences_per_class: 100
-sentences_per_class: 1000  # Combined train + test
+train_sentences_per_class: 2600
+test_sentences_per_class: 400
+sentences_per_class: 3000  # Combined train + test
 
 # Experiment Description
 exp_desc: "gru_perturb_language_baseline"  # Experiment description
