@@ -1,49 +1,52 @@
 import torch
 from typing import Optional, Tuple, List
-from torch.utils.data import Dataset, Subset
+from torch.utils.data import Dataset
 
 def create_binary_task(
-    dataset: torch.utils.data.Dataset,
+    dataset: Dataset,
     class_pair: Tuple[int, int],
     return_indices: bool = False,
-) -> Tuple[torch.utils.data.Dataset, Optional[List[int]]]:
+) -> Tuple[Dataset, Optional[List[int]]]:
     """
     Creates a binary classification task from a dataset using two specified classes.
-    
+
     Args:
-        dataset: A PyTorch dataset with a targets attribute or equivalent.
-        class_pair: Tuple of two class labels to use.
+        dataset: A PyTorch dataset with `sentences` and `targets` attributes.
+        class_pair: Tuple of two class labels to filter on.
         return_indices: If True, also return the indices used.
-    
+
     Returns:
-        A subset of the dataset containing only the specified classes,
+        A dataset containing only the specified classes,
         with labels converted to 0 and 1.
     """
-    # Get indices for the two classes
-    indices = [idx for idx, label in enumerate(dataset.targets) if label in class_pair]
-    
-    # Create a subset of the original dataset
-    subset = Subset(dataset, indices)
-    
-    # Convert labels to binary (0 and 1)
-    class_to_binary = {class_pair[0]: 0, class_pair[1]: 1}
-    
-    # Wrapper to override labels in the subset
-    class BinaryDatasetWrapper(Dataset):
-        def __init__(self, original_dataset, indices):
-            self.dataset = original_dataset
-            self.indices = indices
-            self.targets = [class_to_binary[self.dataset.targets[idx]] for idx in indices]
-        
-        def __len__(self):
-            return len(self.indices)
-        
-        def __getitem__(self, i):
-            image, _ = self.dataset[self.indices[i]]  # Ignore original label
-            return image, self.targets[i]
+    # Unpack the class pair
+    class_0, class_1 = class_pair
 
-    binary_dataset = BinaryDatasetWrapper(dataset, indices)
-    
+    # Filter samples belonging to the two classes
+    indices = [idx for idx, label in enumerate(dataset.targets) if label == class_0 or label == class_1]
+
+    if not indices:
+        raise ValueError(f"No samples found for class pair {class_pair} in the dataset.")
+
+    # Remap labels to binary
+    class_to_binary = {class_0: 0, class_1: 1}
+    filtered_sentences = [dataset.sentences[idx] for idx in indices]
+    filtered_labels = [class_to_binary[dataset.targets[idx].item()] for idx in indices]
+
+    # Define a new dataset for binary classification
+    class BinaryDataset(Dataset):
+        def __init__(self, sentences, targets):
+            self.sentences = sentences
+            self.targets = targets
+
+        def __len__(self):
+            return len(self.sentences)
+
+        def __getitem__(self, idx):
+            return self.sentences[idx], self.targets[idx]
+
+    binary_dataset = BinaryDataset(filtered_sentences, filtered_labels)
+
     if return_indices:
         return binary_dataset, indices
     return binary_dataset
