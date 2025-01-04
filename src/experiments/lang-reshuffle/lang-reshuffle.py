@@ -6,7 +6,7 @@ import argparse
 import yaml
 import logging
 from datetime import datetime
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import pandas as pd
 import tensorflow as tf
 import subprocess
@@ -50,16 +50,15 @@ if not os.path.exists(dataset_file):
 
 # Define Dataset Class
 class LanguageDataset(Dataset):
-    def __init__(self, sentences, labels):
+    def __init__(self, sentences, targets):
         self.sentences = sentences
-        self.labels = labels
-        self.targets = labels  # To ensure shuffle_labels works
+        self.targets = targets
 
     def __len__(self):
         return len(self.sentences)
 
     def __getitem__(self, idx):
-        return self.sentences[idx], self.labels[idx]
+        return self.sentences[idx], self.targets[idx]
 
 def load_language_data(dataset_file, config):
     logging.info("Loading and preprocessing language dataset...")
@@ -83,6 +82,7 @@ def load_language_data(dataset_file, config):
         lang_df = df[df['lang'] == lang].sample(n=config.sentences_per_class, random_state=42)
         if len(lang_df) < config.sentences_per_class:
             raise ValueError(f"Not enough data for language: {lang}")
+        
         X_data.extend(lang_df['sentence'].tolist())
         Y_data.extend([idx] * config.sentences_per_class)
 
@@ -133,8 +133,8 @@ for run in range(config.num_shuffles):
     logging.info(f"\nStarting Run {run + 1}/{config.num_shuffles}")
     
     # Shuffle the labels
-    shuffled_train, label_mapping = shuffle_labels(train_dataset)
-    shuffled_test, _ = shuffle_labels(test_dataset, label_mapping)
+    shuffled_train, label_mapping = shuffle_labels(train_dataset, None, config.num_classes)
+    shuffled_test, _ = shuffle_labels(test_dataset, label_mapping, config.num_classes)
 
     # Train the model
     train_losses, test_accuracies = train_model(

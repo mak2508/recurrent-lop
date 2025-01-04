@@ -1,7 +1,7 @@
 torch
 numpy
 pandas
-tensorflow
+torchtext
 pyyaml
 argparse
 logging
