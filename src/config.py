@@ -23,6 +23,10 @@ class Config:
     algo: Literal["BP", "CBP"] = "BP"
     num_shuffles: int = 3
     to_perturb: bool = False
+    perturb_scale: float = 0.1  # Scale for perturbation during training
+    loss: Literal["nll", "mse"] = "nll"  # Loss function type
+    opt: Literal["adam", "sgd"] = "adam"  # Optimizer type
+    weight_decay: float = 0.0  # Weight decay for optimizer
 
     # Dataset parameters
     languages: List[str] = ("spa", "por", "ita", "fra", "ron", "deu", "cmn", "rus", "hin", "ara")
@@ -53,6 +57,10 @@ class Config:
             algo=config_dict.get('training', {}).get('algo', cls.algo),
             num_shuffles=config_dict.get('training', {}).get('num_shuffles', cls.num_shuffles),
             to_perturb=config_dict.get('training', {}).get('to_perturb', cls.to_perturb),
+            perturb_scale=config_dict.get('training', {}).get('perturb_scale', cls.perturb_scale),
+            loss=config_dict.get('training', {}).get('loss', cls.loss),
+            opt=config_dict.get('training', {}).get('opt', cls.opt),
+            weight_decay=config_dict.get('training', {}).get('weight_decay', cls.weight_decay),
             languages=config_dict.get('languages', cls.languages),
             train_sentences_per_class=config_dict.get('train_sentences_per_class', cls.train_sentences_per_class),
             test_sentences_per_class=config_dict.get('test_sentences_per_class', cls.test_sentences_per_class),
