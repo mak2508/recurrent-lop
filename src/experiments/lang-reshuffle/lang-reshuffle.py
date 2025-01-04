@@ -65,18 +65,16 @@ def load_language_data(dataset_file, config):
     logging.info("Loading and preprocessing language dataset...")
     df = pd.read_csv(dataset_file, sep='\t', header=None, quoting=3, names=['id', 'lang', 'sentence'])
 
-    # Filter and preprocess dataset
     df = df.dropna(subset=['sentence'])
     df = df[df['lang'].isin(config.languages)]
     df = df[df['sentence'].str.strip() != '']
 
-    # Load Hugging Face tokenizer
+    # Initialize tokenizer
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-    vocab_size = len(tokenizer)
+    config.input_size = tokenizer.vocab_size  # Dynamically update input size
+    logging.info(f"Tokenizer initialized with vocab_size: {tokenizer.vocab_size}")
+    logging.info(f"Updated model input_size to match tokenizer vocab size: {config.input_size}")
 
-    logging.info(f"Tokenizer initialized with vocab_size: {vocab_size}")
-
-    # Prepare data for each language
     X_data, Y_data = [], []
     for idx, lang in enumerate(config.languages):
         lang_df = df[df['lang'] == lang].sample(n=config.sentences_per_class, random_state=42)
@@ -86,40 +84,31 @@ def load_language_data(dataset_file, config):
         X_data.extend(lang_df['sentence'].tolist())
         Y_data.extend([idx] * config.sentences_per_class)
 
-    # Shuffle the data
-    logging.info("Shuffling the dataset...")
     combined = list(zip(X_data, Y_data))
-    np.random.seed(42)  # For reproducibility
+    np.random.seed(42)
     np.random.shuffle(combined)
     X_data, Y_data = zip(*combined)
 
-    # Tokenize and pad sequences
-    logging.info("Tokenizing and padding sentences...")
+    # Tokenize and pad sentences
     encoded_inputs = tokenizer(
         list(X_data),
-        max_length=config.max_length,
+        max_length=config.max_length,  # Reference correct attribute
         padding="max_length",
         truncation=True,
         return_tensors="pt"
     )
     X_data_padded = encoded_inputs["input_ids"]
+
     Y_data = torch.tensor(Y_data, dtype=torch.long)
 
-    # Split into training and testing sets
     train_size = config.train_sentences_per_class * len(config.languages)
     X_train, Y_train = X_data_padded[:train_size], Y_data[:train_size]
     X_test, Y_test = X_data_padded[train_size:], Y_data[train_size:]
 
-    # Move to the correct device
-    X_train, Y_train = X_train.to(device), Y_train.to(device)
-    X_test, Y_test = X_test.to(device), Y_test.to(device)
-
-    # Create datasets
     train_dataset = LanguageDataset(X_train, Y_train)
     test_dataset = LanguageDataset(X_test, Y_test)
+    return train_dataset, test_dataset, config.input_size
 
-    logging.info("Datasets created with shuffled splits.")
-    return train_dataset, test_dataset, vocab_size
 
 # Load data
 train_dataset, test_dataset, vocab_size = load_language_data(dataset_file, config)

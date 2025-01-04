@@ -7,7 +7,7 @@ model:
   num_classes: 10        # Number of languages
   vocab_limit: 10000     # Vocabulary limit (maximum number of words in the vocabulary)
   max_length: 50         # Maximum sequence length
-  dropout_rate: 0.0      # Dropout rate for regularization
+  dropout_rate: 0.2      # Dropout rate for regularization
 
 # Training Configuration
 training:
@@ -17,6 +17,7 @@ training:
   learning_rate: 0.01    # Learning rate
   num_tasks: 150         # Number of tasks to repeat
   num_shuffles: 150      # Number of tasks to repeat with shuffling
+  weight_decay: 0.0001   # Added for l2-regularization
 
 # Dataset Configuration
 languages: ['spa', 'por', 'ita', 'fra', 'ron', 'deu', 'cmn', 'rus', 'hin', 'ara'] # List of languages
