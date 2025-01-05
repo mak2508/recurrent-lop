@@ -15,7 +15,7 @@ class GRU(nn.Module):
 
         self.hidden_size = hidden_size
         self.num_layers = num_layers
-
+        self.input_size = input_size
         # Embedding layer to convert input tokens to embeddings
         self.embedding = nn.Embedding(input_size, embedding_dim)
 

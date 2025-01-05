@@ -20,7 +20,7 @@ class Config:
     batch_size: int = 64
     learning_rate: float = 0.01
     num_tasks: int = 3        # Number of tasks to repeat
-    algo: Literal["BP", "CBP"] = "BP"
+    algo: Literal["BP", "CBP_MLP, CBP_LSTM"] = "BP"
     num_shuffles: int = 3
     to_perturb: bool = False
     perturb_scale: float = 0.1  # Scale for perturbation during training

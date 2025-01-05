@@ -45,7 +45,7 @@ class Backprop(AlgoType):
         """
         self.opt.zero_grad()
         output = self.net.forward(x=x)
-        loss = self.loss_func(output, target)
+        loss = self.loss_func(output, target.long())
 
         loss.backward()
         self.opt.step()
