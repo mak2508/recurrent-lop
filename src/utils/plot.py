@@ -1,3 +1,5 @@
+import os
+import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Optional
 
@@ -16,7 +18,7 @@ def plot_results(
         all_test_accuracies (list): List of lists containing test accuracies for each run
         num_shuffles (int): Number of different label shuffles/runs
         save_path (str, optional): Base path to save the figures. If None, figures are not saved
-        model_name (str): Name of the model for file naming
+        exp_desc (str): Experiment description
     """
     # Combine all losses and accuracies into single lists
     combined_losses = [loss for run_losses in all_train_losses for loss in run_losses]
@@ -66,4 +68,55 @@ def plot_results(
     plt.tight_layout()
     if save_path:
         plt.savefig(f'{save_path}/combined.png')
+    plt.show()
+
+
+def plot_comparison(
+    results: dict,
+    config_files: list,
+    save_path: Optional[str] = None
+) -> None:
+    """
+    Plot line comparison of final accuracies across multiple configurations and save the output.
+
+    Args:
+        results (dict): Dictionary containing configuration names as keys and lists of final accuracies as values.
+        config_files (list): List of config file paths used as input.
+        save_path (str, optional): Path to save the figure. If None, the figure is not saved.
+    """
+    # Use base filenames as labels
+    labels = [os.path.basename(config_file) for config_file in config_files]
+
+    # Check if all labels exist in results
+    for label in labels:
+        if label not in results:
+            raise KeyError(f"Config file '{label}' not found in results.")
+
+    # Create output directory if save_path is provided
+    if save_path:
+        os.makedirs(save_path, exist_ok=True)
+
+    # Plot line comparison for each config
+    plt.figure(figsize=(12, 7))
+    for label in labels:
+        plt.plot(
+            results[label],
+            label=label,
+            marker='o',
+            linestyle='-',
+            linewidth=2
+        )
+
+    plt.title("Comparison of Final Accuracies Across Configurations", fontsize=16)
+    plt.xlabel("Shuffle Index", fontsize=14)
+    plt.ylabel("Final Accuracy (%)", fontsize=14)
+    plt.legend(title="Configuration", fontsize=12)
+    plt.grid(alpha=0.5)
+
+    # Save the plot as an image
+    if save_path:
+        plot_file = os.path.join(save_path, "line_comparison_plot.png")
+        plt.savefig(plot_file, format="png", dpi=300, bbox_inches="tight")
+
+    plt.tight_layout()
     plt.show()

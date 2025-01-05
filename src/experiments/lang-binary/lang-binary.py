@@ -23,23 +23,14 @@ project_root = os.path.abspath(os.path.join(os.getcwd(), '..', '..', '..'))
 sys.path.append(project_root)
 
 from src.train import train_model
-from src.utils import create_binary_task, plot_results, load_model, load_algo
+from src.utils import create_binary_task, plot_results, plot_comparison, load_model, load_algo
 from src.config import Config
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Train Binary Tasks for Language Classification')
-parser.add_argument('--config', type=str, required=True, help='Path to config file')
+parser.add_argument('--config', nargs='+', required=True, help='Path(s) to config file(s)')
+parser.add_argument('--compare', action='store_true', help='Enable comparison mode for multiple configs')
 args = parser.parse_args()
-
-# Load config file
-with open(args.config, 'r') as f:
-    config = yaml.safe_load(f)
-
-# Initialize config from dict
-config = Config.from_dict(config)
-
-# Set random seed for reproducibility
-torch.manual_seed(42)
 
 # Download dataset if not present
 dataset_file = 'tatoeba_sentences.csv'
@@ -103,65 +94,116 @@ def load_full_dataset(dataset_file, config):
 
     return LanguageDataset(X_data_padded, Y_data)
 
-logging.info("Loading full dataset...")
-full_dataset = load_full_dataset(dataset_file, config)
-logging.info("Full dataset loaded successfully.")
+if args.compare:
+    # Comparison mode: Handle multiple configs
+    results = {}
+    for config_path in args.config:
+        with open(config_path, 'r') as f:
+            config_dict = yaml.safe_load(f)
+            config = Config.from_dict(config_dict)
 
-# Prepare language pairs
-logging.info("Preparing binary tasks...")
-lang_pairs = list(itertools.permutations(range(len(config.languages)), 2))
-random.shuffle(lang_pairs)
+        config_name = os.path.basename(config_path)
+        logging.info(f"Processing config: {config_name}")
 
-# Dynamically handle task count
-task_batches = []
-while len(task_batches) * len(lang_pairs) < config.num_tasks:
+        full_dataset = load_full_dataset(dataset_file, config)
+
+        # Prepare language pairs
+        lang_pairs = list(itertools.permutations(range(len(config.languages)), 2))
+        random.shuffle(lang_pairs)
+
+        # Dynamically handle task count
+        task_batches = []
+        while len(task_batches) * len(lang_pairs) < config.num_tasks:
+            random.shuffle(lang_pairs)
+            task_batches.extend(lang_pairs)
+
+        # Limit total tasks to `config.num_tasks`
+        task_batches = task_batches[:config.num_tasks]
+
+        # Load model and algorithm
+        model = load_model(config)
+        algo = load_algo(model, config)
+
+        final_accuracies = []
+
+        # Train on binary tasks
+        for task_idx, (lang1, lang2) in enumerate(task_batches):
+            logging.info(f"\nStarting Task {task_idx + 1}/{config.num_tasks} for {config.exp_desc}: "
+                         f"Comparing {config.languages[lang1]} vs {config.languages[lang2]}")
+            binary_task = create_binary_task(full_dataset, (lang1, lang2))
+            train_size = int(0.8 * len(binary_task))
+            test_size = len(binary_task) - train_size
+            train_dataset, test_dataset = random_split(binary_task, [train_size, test_size])
+
+            _, test_accuracies = train_model(
+                algo=algo,
+                train_data=train_dataset,
+                test_data=test_dataset,
+                num_epochs=config.num_epochs,
+                device=device,
+                batch_size=config.batch_size,
+            )
+
+            final_accuracies.append(test_accuracies[-1])  # Final epoch accuracy
+
+        results[config_name] = final_accuracies
+
+    # Generate comparison plot
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = f"output/{timestamp}_comparison/"
+    os.makedirs(output_dir, exist_ok=True)
+    plot_comparison(results, args.config, output_dir)
+else:
+    # Single config mode: Original behavior
+    with open(args.config[0], 'r') as f:
+        config = yaml.safe_load(f)
+    config = Config.from_dict(config)
+
+    full_dataset = load_full_dataset(dataset_file, config)
+
+    # Prepare language pairs
+    lang_pairs = list(itertools.permutations(range(len(config.languages)), 2))
     random.shuffle(lang_pairs)
-    task_batches.extend(lang_pairs)
 
-# Limit total tasks to `config.num_tasks`
-task_batches = task_batches[:config.num_tasks]
+    task_batches = []
+    while len(task_batches) * len(lang_pairs) < config.num_tasks:
+        random.shuffle(lang_pairs)
+        task_batches.extend(lang_pairs)
 
-# Load model and algorithm
-model = load_model(config)
-algo = load_algo(model, config)
+    task_batches = task_batches[:config.num_tasks]
 
-all_train_losses = []
-all_test_accuracies = []
+    model = load_model(config)
+    algo = load_algo(model, config)
 
-# Train on binary tasks
-logging.info("Starting training...")
-for task_idx, (lang1, lang2) in enumerate(task_batches):
-    logging.info(f"Task {task_idx + 1}/{config.num_tasks}: Comparing {config.languages[lang1]} vs {config.languages[lang2]}")
+    all_train_losses = []
+    all_test_accuracies = []
 
-    # Filter out samples for the current binary task
-    binary_task = create_binary_task(full_dataset, (lang1, lang2))
+    for task_idx, (lang1, lang2) in enumerate(task_batches):
+        logging.info(f"\nStarting Task {task_idx + 1}/{config.num_tasks} for {config.exp_desc}: "
+                     f"Comparing {config.languages[lang1]} vs {config.languages[lang2]}")
+        binary_task = create_binary_task(full_dataset, (lang1, lang2))
+        train_size = int(0.8 * len(binary_task))
+        test_size = len(binary_task) - train_size
+        train_dataset, test_dataset = random_split(binary_task, [train_size, test_size])
 
-    # Split into train and test datasets
-    train_size = int(0.8 * len(binary_task))
-    test_size = len(binary_task) - train_size
-    train_dataset, test_dataset = random_split(binary_task, [train_size, test_size])
+        train_losses, test_accuracies = train_model(
+            algo=algo,
+            train_data=train_dataset,
+            test_data=test_dataset,
+            num_epochs=config.num_epochs,
+            device=device,
+            batch_size=config.batch_size,
+        )
 
-    # Train the model
-    train_losses, test_accuracies = train_model(
-        algo=algo,
-        train_data=train_dataset,
-        test_data=test_dataset,
-        num_epochs=config.num_epochs,
-        device=device,
-        batch_size=config.batch_size,
-    )
+        all_train_losses.append(train_losses)
+        all_test_accuracies.append(test_accuracies)
 
-    all_train_losses.append(train_losses)
-    all_test_accuracies.append(test_accuracies)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = f"output/{timestamp}/"
+    os.makedirs(output_dir, exist_ok=True)
 
-# Save results
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-output_dir = f"output/{timestamp}/"
-os.makedirs(output_dir, exist_ok=True)
+    np.save(f"{output_dir}/train_losses.npy", all_train_losses)
+    np.save(f"{output_dir}/test_accuracies.npy", all_test_accuracies)
 
-np.save(f"{output_dir}/train_losses.npy", all_train_losses)
-np.save(f"{output_dir}/test_accuracies.npy", all_test_accuracies)
-
-# Plot results
-plot_results(all_train_losses, all_test_accuracies, config.num_tasks, output_dir)
-logging.info("Training complete.")
+    plot_results(all_train_losses, all_test_accuracies, config.num_tasks, output_dir)
+    logging.info("Training complete.")
