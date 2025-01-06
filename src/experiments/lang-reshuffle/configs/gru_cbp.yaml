@@ -7,19 +7,17 @@ model:
   num_layers: 1                # Number of GRU layers
   num_classes: 10              # Number of languages
   vocab_limit: 0               # Vocabulary limit (maximum number of words in the vocabulary)
-  max_length: 50               # Maximum sequence length
+  max_length: 25               # Maximum sequence length
   dropout_rate: 0.0            # Dropout rate for regularization
 
 # Training Configuration
 training:
-  algo: "BP"                   # Backprop
+  algo: "CBP_GRU"              # Training algorithm (Backprop)
   num_epochs: 30               # Number of epochs
   batch_size: 512              # Batch size
   learning_rate: 0.01          # Learning rate
   num_tasks: 100               # Number of tasks to repeat
   num_shuffles: 100            # Number of tasks to repeat with shuffling
-  to_perturb: True             # Set up the boolean for perturbing
-  perturb_scale: 0.001         # Set up the perturb scale
 
 # Dataset Configuration
 languages: ["spa", "por", "ita", "fra", "ron", "deu", "cmn", "rus", "hin", "ara"] # List of languages
@@ -28,4 +26,4 @@ test_sentences_per_class: 400   # Number of testing sentences per class
 sentences_per_class: 3000       # Combined train + test
 
 # Experiment Description
-exp_desc: "gru_perturb_language_baseline" # Experiment description
+exp_desc: "gru_language_baseline" # Experiment description

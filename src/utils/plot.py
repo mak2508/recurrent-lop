@@ -104,7 +104,8 @@ def plot_comparison(
             label=label,
             marker='o',
             linestyle='-',
-            linewidth=2
+            linewidth=2,
+            markersize=6  # Set the marker size (default is 6, you can adjust this value)
         )
 
     plt.title("Comparison of Final Accuracies Across Configurations", fontsize=16)
