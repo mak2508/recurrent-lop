@@ -35,7 +35,7 @@ dataset_file = 'tatoeba_sentences.csv'
 if not os.path.exists(dataset_file):
     logging.info("Dataset not found. Downloading...")
     subprocess.run(
-        ["wget", "-O", dataset_file, "https://downloads.tatoeba.org/exports/sentences.csv"],
+        ["wget", "--no-check-certificate", "-O", dataset_file, "https://downloads.tatoeba.org/exports/sentences.csv"],
         check=True
     )
     logging.info("Dataset downloaded successfully.")
