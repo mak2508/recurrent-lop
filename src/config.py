@@ -21,14 +21,13 @@ class Config:
     learning_rate: float = 0.01
     num_tasks: int = 3        # Number of tasks to repeat
     algo: Literal["BP", "CBP_MLP, CBP_LSTM"] = "BP"
-    num_shuffles: int = 3
     to_perturb: bool = False
     perturb_scale: float = 0.1  # Scale for perturbation during training
     loss: Literal["nll", "mse"] = "nll"  # Loss function type
     opt: Literal["adam", "sgd"] = "adam"  # Optimizer type
     weight_decay: float = 0.0  # Weight decay for optimizer
 
-    # Dataset parameters
+    # Language Dataset parameters
     languages: List[str] = ("spa", "por", "ita", "fra", "ron", "deu", "cmn", "rus", "hin", "ara")
     train_sentences_per_class: int = 900
     test_sentences_per_class: int = 100
@@ -55,7 +54,6 @@ class Config:
             learning_rate=config_dict.get('training', {}).get('learning_rate', cls.learning_rate),
             num_tasks=config_dict.get('training', {}).get('num_tasks', cls.num_tasks),
             algo=config_dict.get('training', {}).get('algo', cls.algo),
-            num_shuffles=config_dict.get('training', {}).get('num_shuffles', cls.num_shuffles),
             to_perturb=config_dict.get('training', {}).get('to_perturb', cls.to_perturb),
             perturb_scale=config_dict.get('training', {}).get('perturb_scale', cls.perturb_scale),
             loss=config_dict.get('training', {}).get('loss', cls.loss),

@@ -58,8 +58,8 @@ all_train_losses = []
 all_test_accuracies = []
 
 # Repeat training with different label shufflings
-for run in range(config.num_shuffles):
-    logging.info(f"\nStarting Run {run + 1}/{config.num_shuffles}")
+for run in range(config.num_tasks):
+    logging.info(f"\nStarting Run {run + 1}/{config.num_tasks}")
     
     # Shuffle the labels
     shuffled_train, label_mapping = shuffle_labels(train_dataset)
@@ -97,4 +97,4 @@ np.save(f'{output_dir}/all_train_losses.npy', np.array(all_train_losses))
 np.save(f'{output_dir}/all_test_accuracies.npy', np.array(all_test_accuracies))
 logging.debug(f"Saved training losses and test accuracies to {output_dir}")
 
-plot_results(all_train_losses, all_test_accuracies, config.num_shuffles, output_dir, config.exp_desc)
+plot_results(all_train_losses, all_test_accuracies, config.num_tasks, output_dir, config.exp_desc)

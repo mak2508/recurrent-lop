@@ -114,8 +114,8 @@ if args.compare:
         algo = load_algo(model, config)
 
         final_accuracies = []
-        for run in range(config.num_shuffles):
-            logging.info(f"\nStarting Run {run + 1}/{config.num_shuffles} for {config.exp_desc}")
+        for run in range(config.num_tasks):
+            logging.info(f"\nStarting Run {run + 1}/{config.num_tasks} for {config.exp_desc}")
             
             shuffled_train, label_mapping = shuffle_labels(train_dataset, None, config.num_classes)
             shuffled_test, _ = shuffle_labels(test_dataset, label_mapping, config.num_classes)
@@ -153,8 +153,8 @@ else:
     all_train_losses = []
     all_test_accuracies = []
 
-    for run in range(config.num_shuffles):
-        logging.info(f"\nStarting Run {run + 1}/{config.num_shuffles}")
+    for run in range(config.num_tasks):
+        logging.info(f"\nStarting Run {run + 1}/{config.num_tasks}")
         
         shuffled_train, label_mapping = shuffle_labels(train_dataset, None, config.num_classes)
         shuffled_test, _ = shuffle_labels(test_dataset, label_mapping, config.num_classes)
@@ -183,4 +183,4 @@ else:
     logging.debug(f"Saved results to {output_dir}")
 
     # Plot results
-    plot_results(all_train_losses, all_test_accuracies, config.num_shuffles, output_dir, config.exp_desc)
+    plot_results(all_train_losses, all_test_accuracies, config.num_tasks, output_dir, config.exp_desc)

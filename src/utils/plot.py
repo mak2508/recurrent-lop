@@ -6,7 +6,7 @@ from typing import List, Optional
 def plot_results(
     all_train_losses: List[List[float]],
     all_test_accuracies: List[List[float]],
-    num_shuffles: int,
+    num_tasks: int,
     save_path: Optional[str] = None,
     exp_desc: str = ""
 ) -> None:
@@ -16,7 +16,7 @@ def plot_results(
     Args:
         all_train_losses (list): List of lists containing training losses for each run
         all_test_accuracies (list): List of lists containing test accuracies for each run
-        num_shuffles (int): Number of different label shuffles/runs
+        num_tasks (int): Number of different label shuffles/runs
         save_path (str, optional): Base path to save the figures. If None, figures are not saved
         exp_desc (str): Experiment description
     """
@@ -30,8 +30,8 @@ def plot_results(
     plt.title('Training Loss', fontsize=14)
     plt.xlabel('Training Steps', fontsize=12)
     plt.ylabel('Loss', fontsize=12)
-    for i in range(1, num_shuffles):
-        plt.axvline(x=i*len(combined_losses)//num_shuffles, color='red', linestyle='--', alpha=0.5)
+    for i in range(1, num_tasks):
+        plt.axvline(x=i*len(combined_losses)//num_tasks, color='red', linestyle='--', alpha=0.5)
     if save_path:
         plt.savefig(f'{save_path}/loss.png')
     plt.close(fig_loss)
@@ -42,8 +42,8 @@ def plot_results(
     plt.title('Test Accuracy', fontsize=14)
     plt.xlabel('Epochs', fontsize=12)
     plt.ylabel('Accuracy (%)', fontsize=12)
-    for i in range(1, num_shuffles):
-        plt.axvline(x=i*len(combined_accuracies)//num_shuffles, color='red', linestyle='--', alpha=0.5)
+    for i in range(1, num_tasks):
+        plt.axvline(x=i*len(combined_accuracies)//num_tasks, color='red', linestyle='--', alpha=0.5)
     if save_path:
         plt.savefig(f'{save_path}/accuracy.png')
     plt.close(fig_acc)
@@ -55,15 +55,15 @@ def plot_results(
     ax1.set_title('Training Loss', fontsize=14)
     ax1.set_xlabel('Training Steps', fontsize=12)
     ax1.set_ylabel('Loss', fontsize=12)
-    for i in range(1, num_shuffles):
-        ax1.axvline(x=i*len(combined_losses)//num_shuffles, color='red', linestyle='--', alpha=0.5)
+    for i in range(1, num_tasks):
+        ax1.axvline(x=i*len(combined_losses)//num_tasks, color='red', linestyle='--', alpha=0.5)
 
     ax2.plot(combined_accuracies)
     ax2.set_title('Test Accuracy', fontsize=14)
     ax2.set_xlabel('Epochs', fontsize=12)
     ax2.set_ylabel('Accuracy (%)', fontsize=12)
-    for i in range(1, num_shuffles):
-        ax2.axvline(x=i*len(combined_accuracies)//num_shuffles, color='red', linestyle='--', alpha=0.5)
+    for i in range(1, num_tasks):
+        ax2.axvline(x=i*len(combined_accuracies)//num_tasks, color='red', linestyle='--', alpha=0.5)
 
     plt.tight_layout()
     if save_path:

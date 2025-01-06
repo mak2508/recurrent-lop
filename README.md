@@ -40,7 +40,7 @@ training:
   num_epochs: 2  # Set to 25 for full training
   batch_size: 6000
   learning_rate: 0.01
-  num_shuffles: 3  # Number of times to repeat training with different label shufflings
+  num_tasks: 3  # Number of times to repeat training with different label shufflings
   to_perturb: False
 
 exp_desc: "mlp"  # Experiment description for output directory naming
