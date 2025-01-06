@@ -30,22 +30,22 @@ def create_binary_task(
 
     # Remap labels to binary
     class_to_binary = {class_0: 0, class_1: 1}
-    filtered_sentences = [dataset.sentences[idx] for idx in indices]
+    filtered_data = [dataset.sentences[idx] for idx in indices] if hasattr(dataset, 'sentences') else [dataset.data[idx].clone().detach().to(torch.float32) for idx in indices]
     filtered_labels = [class_to_binary[dataset.targets[idx].item()] for idx in indices]
 
     # Define a new dataset for binary classification
     class BinaryDataset(Dataset):
-        def __init__(self, sentences, targets):
-            self.sentences = sentences
+        def __init__(self, data, targets):
+            self.data = data
             self.targets = targets
 
         def __len__(self):
-            return len(self.sentences)
+            return len(self.data)
 
         def __getitem__(self, idx):
-            return self.sentences[idx], self.targets[idx]
+            return self.data[idx], self.targets[idx]
 
-    binary_dataset = BinaryDataset(filtered_sentences, filtered_labels)
+    binary_dataset = BinaryDataset(filtered_data, filtered_labels)
 
     if return_indices:
         return binary_dataset, indices
