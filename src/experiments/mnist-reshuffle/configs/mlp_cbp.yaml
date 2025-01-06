@@ -8,7 +8,7 @@ model:
 
 # Training Configuration
 training:
-  algo: "CBP_MLP" # BP or CBP (yet to be implemented)
+  algo: "CBP_MLP" # BP or CBP
   num_epochs: 10 # Set to 25 for full training
   batch_size: 6000
   learning_rate: 0.01

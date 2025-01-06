@@ -8,13 +8,14 @@ model:
 
 # Training Configuration
 training:
-  algo: "BP" # BP or CBP (yet to be implemented)
+  algo: "BP" # BP or CBP
   num_epochs: 2  # Set to 25 for full training
   batch_size: 6000
   learning_rate: 0.01
   num_shuffles: 3  # Number of times to repeat training with different label shufflings
   to_perturb: True
-  perturb_scale: 0.01
+  perturb_scale: 0.00001
+  weight_decay: 0.00001
   
 exp_desc: "lstm_perturb"  # Experiment description for output directory naming
 
