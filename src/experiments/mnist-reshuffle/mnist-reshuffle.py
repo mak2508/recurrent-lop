@@ -41,11 +41,16 @@ test_dataset = torchvision.datasets.MNIST(root='./data', train=False, transform=
 if args.compare:
     # Comparison mode: Handle multiple configs
     results = {}
-    reshuffling_runs = []
     exp_descs = []  # Store experiment descriptions for plotting
 
-    # Pre-generate reshufflings for consistency across experiments
-    for run in range(Config.default_num_tasks):  # Assume a default `num_tasks` in Config
+    # Load the first config to determine the number of tasks
+    with open(args.config[0], 'r') as f:
+        config_dict = yaml.safe_load(f)
+        base_config = Config.from_dict(config_dict)
+
+    # Pre-generate reshufflings for `base_config.num_tasks`
+    reshuffling_runs = []
+    for run in range(base_config.num_tasks):
         shuffled_train, label_mapping = shuffle_labels(train_dataset)
         shuffled_test, _ = shuffle_labels(test_dataset, label_mapping)
         reshuffling_runs.append((shuffled_train, shuffled_test, label_mapping))
@@ -66,14 +71,15 @@ if args.compare:
         model = load_model(config)
         algo = load_algo(model, config)
 
-        final_accuracies = []
+        all_train_losses = []
+        all_test_accuracies = []
 
         # Train with pre-generated reshufflings
         for run, (shuffled_train, shuffled_test, label_mapping) in enumerate(reshuffling_runs):
-            logging.info(f"\nStarting Run {run + 1}/{config.num_tasks} for {config.exp_desc}")
+            logging.info(f"\nStarting Run {run + 1}/{base_config.num_tasks} for {config.exp_desc}")
             
             # Train the model
-            _, test_accuracies = train_model(
+            train_losses, test_accuracies = train_model(
                 algo=algo,
                 train_data=shuffled_train,
                 test_data=shuffled_test,
@@ -82,14 +88,15 @@ if args.compare:
                 batch_size=config.batch_size
             )
 
-            final_accuracies.append(test_accuracies[-1])  # Final accuracy of the last epoch
-
-        results[config.exp_desc] = final_accuracies
+            all_train_losses.append(train_losses)
+            all_test_accuracies.append(test_accuracies)
 
         # Save results for this config
         final_accuracies_path = f'{output_dir}/{config.exp_desc}_final_accuracies.npy'
-        np.save(final_accuracies_path, np.array(final_accuracies))
+        np.save(final_accuracies_path, np.array([acc[-1] for acc in all_test_accuracies]))
         logging.info(f"Saved final accuracies for {config.exp_desc} to {final_accuracies_path}")
+
+        results[config.exp_desc] = [acc[-1] for acc in all_test_accuracies]
 
     # Generate comparison plot
     plot_comparison(results, exp_descs, output_dir)
