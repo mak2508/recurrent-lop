@@ -97,28 +97,41 @@ def load_full_dataset(dataset_file, config):
 if args.compare:
     # Comparison mode: Handle multiple configs
     results = {}
+    exp_descs = []  # List to store experiment descriptions for plotting
+
+    # Create a single output directory
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = f"output/{timestamp}_comparison/"
+    os.makedirs(output_dir, exist_ok=True)
+
+    config_path = args.config[0]
+    with open(config_path, 'r') as f:
+        config_dict = yaml.safe_load(f)
+        config = Config.from_dict(config_dict)
+
+    # Prepare language pairs
+    lang_pairs = list(itertools.permutations(range(len(config.languages)), 2))
+    random.shuffle(lang_pairs)
+
+    # Dynamically handle task count
+    task_batches = []
+    while len(task_batches) * len(lang_pairs) < config.num_tasks:
+        random.shuffle(lang_pairs)
+        task_batches.extend(lang_pairs)
+
+    # Limit total tasks to `config.num_tasks`
+    task_batches = task_batches[:config.num_tasks]
+
     for config_path in args.config:
         with open(config_path, 'r') as f:
             config_dict = yaml.safe_load(f)
             config = Config.from_dict(config_dict)
 
+        exp_descs.append(config.exp_desc)  # Collect experiment descriptions
         config_name = os.path.basename(config_path)
         logging.info(f"Processing config: {config_name}")
 
         full_dataset = load_full_dataset(dataset_file, config)
-
-        # Prepare language pairs
-        lang_pairs = list(itertools.permutations(range(len(config.languages)), 2))
-        random.shuffle(lang_pairs)
-
-        # Dynamically handle task count
-        task_batches = []
-        while len(task_batches) * len(lang_pairs) < config.num_tasks:
-            random.shuffle(lang_pairs)
-            task_batches.extend(lang_pairs)
-
-        # Limit total tasks to `config.num_tasks`
-        task_batches = task_batches[:config.num_tasks]
 
         # Load model and algorithm
         model = load_model(config)
@@ -146,13 +159,15 @@ if args.compare:
 
             final_accuracies.append(test_accuracies[-1])  # Final epoch accuracy
 
-        results[config_name] = final_accuracies
+        results[config.exp_desc] = final_accuracies  # Use exp_desc as the key
+
+        # Save final accuracies for this configuration in the unified directory
+        final_accuracies_path = f"{output_dir}/{config.exp_desc}_final_accuracies.npy"
+        np.save(final_accuracies_path, np.array(final_accuracies))
+        logging.info(f"Saved final accuracies for {config.exp_desc} to {final_accuracies_path}")
 
     # Generate comparison plot
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f"output/{timestamp}_comparison/"
-    os.makedirs(output_dir, exist_ok=True)
-    plot_comparison(results, args.config, output_dir)
+    plot_comparison(results, exp_descs, output_dir)
 else:
     # Single config mode: Original behavior
     with open(args.config[0], 'r') as f:
