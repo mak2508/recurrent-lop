@@ -17,7 +17,6 @@ training:
   batch_size: 512              # Batch size
   learning_rate: 0.01          # Learning rate
   num_tasks: 100               # Number of tasks to repeat
-  num_shuffles: 100            # Number of tasks to repeat with shuffling
 
 # Dataset Configuration
 languages: ["spa", "por", "ita", "fra", "ron", "deu", "cmn", "rus", "hin", "ara"] # List of languages
@@ -26,4 +25,4 @@ test_sentences_per_class: 400   # Number of testing sentences per class
 sentences_per_class: 3000       # Combined train + test
 
 # Experiment Description
-exp_desc: "gru_language_baseline" # Experiment description
+exp_desc: "gru_reshuffle_cbp" # Experiment description

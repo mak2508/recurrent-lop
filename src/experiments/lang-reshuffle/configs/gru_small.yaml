@@ -16,8 +16,7 @@ training:
   num_epochs: 30         # Number of epochs
   batch_size: 512        # Batch size
   learning_rate: 0.01    # Learning rate
-  num_tasks: 150         # Number of tasks to repeat
-  num_tasks: 150      # Number of tasks to repeat with shuffling
+  num_tasks: 100         # Number of tasks to repeat
 
 # Dataset Configuration
 languages: ['spa', 'por', 'ita', 'fra', 'ron', 'deu', 'cmn', 'rus', 'hin', 'ara'] # List of languages
@@ -26,4 +25,4 @@ test_sentences_per_class: 400
 sentences_per_class: 3000  # Combined train + test
 
 # Experiment Description
-exp_desc: "gru_language_baseline"  # Experiment description
+exp_desc: "gru_reshuffle_small"  # Experiment description

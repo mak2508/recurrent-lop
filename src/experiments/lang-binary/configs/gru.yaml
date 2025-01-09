@@ -16,7 +16,6 @@ training:
   batch_size: 128        # Batch size
   learning_rate: 0.1     # Learning rate
   num_tasks: 150         # Number of tasks to repeat
-  num_tasks: 150      # Number of tasks to repeat with shuffling
 
 # Dataset Configuration
 languages: [

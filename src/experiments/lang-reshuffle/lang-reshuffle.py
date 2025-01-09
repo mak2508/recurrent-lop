@@ -13,6 +13,7 @@ import subprocess
 from transformers import AutoTokenizer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -101,25 +102,46 @@ def load_language_data(dataset_file, config):
     return train_dataset, test_dataset, config.input_size
 
 if args.compare:
-    # Comparison mode: Handle multiple configs
+    # Comparison mode: Handle multiple configs with consistent reshuffling
     results = {}
+    reshuffling_runs = []
+    exp_descs = []  # List to store experiment descriptions for plot legends
+
+    # Load first config to determine reshuffling parameters
+    with open(args.config[0], 'r') as f:
+        config_dict = yaml.safe_load(f)
+        base_config = Config.from_dict(config_dict)
+
+    train_dataset, test_dataset, _ = load_language_data(dataset_file, base_config)
+
+    # Pre-generate all reshufflings
+    for run in range(base_config.num_tasks):
+        shuffled_train, label_mapping = shuffle_labels(train_dataset, None, base_config.num_classes)
+        shuffled_test, _ = shuffle_labels(test_dataset, label_mapping, base_config.num_classes)
+        reshuffling_runs.append((shuffled_train, shuffled_test))
+
+    # Create a single output directory
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = f'output/{timestamp}_comparison/'
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Apply reshuffling to all configurations
     for config_path in args.config:
         with open(config_path, 'r') as f:
             config_dict = yaml.safe_load(f)
             config = Config.from_dict(config_dict)
 
-        config_name = os.path.basename(config_path)
+        exp_descs.append(config.exp_desc)  # Collect experiment descriptions
+
         train_dataset, test_dataset, vocab_size = load_language_data(dataset_file, config)
         model = load_model(config)
         algo = load_algo(model, config)
 
         final_accuracies = []
-        for run in range(config.num_tasks):
-            logging.info(f"\nStarting Run {run + 1}/{config.num_tasks} for {config.exp_desc}")
+        for run, (shuffled_train, shuffled_test) in enumerate(reshuffling_runs):
+            logging.info(f"\nStarting Run {run + 1}/{base_config.num_tasks} for {config.exp_desc}")
             
-            shuffled_train, label_mapping = shuffle_labels(train_dataset, None, config.num_classes)
-            shuffled_test, _ = shuffle_labels(test_dataset, label_mapping, config.num_classes)
-
+            # Reuse the pre-generated reshufflings
             _, test_accuracies = train_model(
                 algo=algo,
                 train_data=shuffled_train,
@@ -130,13 +152,15 @@ if args.compare:
             )
             final_accuracies.append(test_accuracies[-1])  # Collect final test accuracy
 
-        results[config_name] = final_accuracies
+        results[config.exp_desc] = final_accuracies  # Use exp_desc as key
 
-    # Generate comparison plot
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f'output/{timestamp}_comparison/'
-    os.makedirs(output_dir, exist_ok=True)
-    plot_comparison(results, args.config, output_dir)
+        # Save final accuracies for this configuration in the single output directory
+        final_accuracies_path = f'{output_dir}/{config.exp_desc}_final_accuracies.npy'
+        np.save(final_accuracies_path, np.array(final_accuracies))
+        logging.info(f"Saved final accuracies for {config.exp_desc} to {final_accuracies_path}")
+
+    # Generate comparison plot with exp_descs as labels
+    plot_comparison(results, exp_descs, output_dir)
 else:
     # Single config mode: Original behavior
     with open(args.config[0], 'r') as f:
