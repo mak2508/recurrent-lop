@@ -1,4 +1,5 @@
 import os
+import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Optional
@@ -120,4 +121,67 @@ def plot_comparison(
         plt.savefig(plot_file, format="png", dpi=300, bbox_inches="tight")
 
     plt.tight_layout()
+    #plt.show()
+
+
+def plot_comparison_full_length(
+    numpy_files: List[str],
+    config_files: List[str],
+    type: str,
+    comparison_name: str
+):
+    """
+    Plots a comparison of accuracy/loss of last epoch during each experiments given the configuration files.
+
+    Args:
+        numpy_files (List[str]): A list of paths to NumPy files containing the data to be plotted.
+        config_paths (List[str]): A list of paths to YAML configuration files providing additional settings.
+        type (str): The type of comparison to perform (e.g., "line", "bar", "scatter").
+    """
+    
+    print(type + ' plotting.')
+    save_path = './output/' + comparison_name
+    labels = []
+
+    plt.figure(figsize=(15, 5))
+    plt.title('Training ' + type + ' Comparison', fontsize=14)
+    plt.xlabel('Experiments', fontsize=12)
+    plt.ylabel(type + ' (%)', fontsize=12)
+
+    for numpy_path, config_path in zip(numpy_files, config_files):    
+
+        if type == 'Accuracy':
+            data_path = numpy_path + '/all_test_accuracies.npy'
+        if type == 'Loss':
+            data_path = numpy_path + '/all_train_losses.npy'
+        
+        try:  
+            with open(data_path, 'r') as file:
+                data = np.load(data_path)
+                print('Found: ' + data_path)
+        except FileNotFoundError:
+            print(f"Error: The file '{data_path}' does not exist.")
+        
+        try:  
+            with open(config_path, 'r') as file:
+                config = yaml.safe_load(file)
+                print('Found: ' + config_path)
+        except FileNotFoundError:
+            print(f"Error: The file '{config_path}' does not exist.")
+        except yaml.YAMLError as e:
+            print(f"Error: Failed to parse YAML file. {e}")
+
+        labels.append(config['exp_desc'])
+        plt.plot(data[:, -1])
+
+    plt.legend(labels)
+    plt.tight_layout()
+
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
+    plt.savefig(save_path + '/' + type.lower() + '.png')
+    print(type + ' saved to file: ' + save_path)
+    print()
+
     #plt.show()
