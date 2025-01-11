@@ -144,9 +144,13 @@ def plot_comparison_full_length(
     labels = []
 
     plt.figure(figsize=(15, 5))
-    plt.title('Training ' + type + ' Comparison', fontsize=14)
     plt.xlabel('Experiments', fontsize=12)
     plt.ylabel(type + ' (%)', fontsize=12)
+
+    if type == 'Accuracy':
+        plt.title('Testing ' + type + ' Comparison', fontsize=14)
+    if type == 'Loss':
+        plt.title('Training ' + type + ' Comparison', fontsize=14)
 
     for numpy_path, config_path in zip(numpy_files, config_files):    
 

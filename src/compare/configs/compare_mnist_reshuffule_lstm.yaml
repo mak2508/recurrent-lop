@@ -1,0 +1,11 @@
+accuracy: True
+
+loss: True
+
+numpy_files:
+  - ./../experiments/mnist-reshuffle/output/mnist_reshuffle_lstm
+  - ./../experiments/mnist-reshuffle/output/mnist_reshuffle_lstm_perturb
+
+config_files:
+  - ./../experiments/mnist-reshuffle/configs/lstm.yaml
+  - ./../experiments/mnist-reshuffle/configs/lstm_perturb.yaml
