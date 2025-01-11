@@ -68,7 +68,7 @@ def plot_results(
     plt.tight_layout()
     if save_path:
         plt.savefig(f'{save_path}/combined.png')
-    plt.show()
+    #plt.show()
 
 
 def plot_comparison(
@@ -120,4 +120,4 @@ def plot_comparison(
         plt.savefig(plot_file, format="png", dpi=300, bbox_inches="tight")
 
     plt.tight_layout()
-    plt.show()
+    #plt.show()

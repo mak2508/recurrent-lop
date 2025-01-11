@@ -1,0 +1,8 @@
+numpy
+pandas
+torchtext
+pyyaml
+argparse
+matplotlib
+wget
+transformers

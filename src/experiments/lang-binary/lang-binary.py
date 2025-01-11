@@ -33,7 +33,7 @@ parser.add_argument('--compare', action='store_true', help='Enable comparison mo
 args = parser.parse_args()
 
 # Download dataset if not present
-dataset_file = 'tatoeba_sentences.csv'
+dataset_file = 'sentences.csv'
 if not os.path.exists(dataset_file):
     logging.info("Dataset not found. Downloading...")
     subprocess.run(
@@ -214,7 +214,7 @@ else:
         all_test_accuracies.append(test_accuracies)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = f"output/{timestamp}/"
+    output_dir = f'output/{timestamp}_{config.exp_desc}/'
     os.makedirs(output_dir, exist_ok=True)
 
     np.save(f"{output_dir}/train_losses.npy", all_train_losses)

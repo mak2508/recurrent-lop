@@ -32,7 +32,7 @@ parser.add_argument('--compare', action='store_true', help='Enable comparison mo
 args = parser.parse_args()
 
 # Download dataset if not present
-dataset_file = 'tatoeba_sentences.csv'
+dataset_file = 'sentences.csv'
 if not os.path.exists(dataset_file):
     logging.info("Dataset not found. Downloading...")
     subprocess.run(

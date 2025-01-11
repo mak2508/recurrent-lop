@@ -11,9 +11,9 @@ training:
   num_epochs: 30
   batch_size: 6000
   learning_rate: 0.01
-  num_tasks: 150
+  num_tasks: 50
   to_perturb: True
   perturb_scale: 0.00001
   weight_decay: 0.00001
 
-exp_desc: "mlp"
+exp_desc: "mlp_perturb"

@@ -11,7 +11,7 @@ training:
   num_epochs: 30
   batch_size: 6000
   learning_rate: 0.01
-  num_tasks: 150
+  num_tasks: 50
   to_perturb: False
 
 exp_desc: "mlp"

@@ -11,7 +11,7 @@ training:
   num_epochs: 30         # Number of epochs
   batch_size: 6000        # Batch size
   learning_rate: 0.01     # Learning rate
-  num_tasks: 150        # Number of tasks to repeat
+  num_tasks: 50        # Number of tasks to repeat
 
 # Experiment Description
 exp_desc: "lstm"  # Experiment description
