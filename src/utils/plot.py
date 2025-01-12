@@ -140,17 +140,19 @@ def plot_comparison_full_length(
     """
     
     print(type + ' plotting.')
-    save_path = './output/' + comparison_name
+    font_size = 25
+    save_path = './output'
     labels = []
 
     plt.figure(figsize=(15, 5))
-    plt.xlabel('Experiments', fontsize=12)
-    plt.ylabel(type + ' (%)', fontsize=12)
+    plt.xlabel('Experiments', fontsize=font_size)
 
     if type == 'Accuracy':
-        plt.title('Testing ' + type + ' Comparison', fontsize=14)
+        plt.title('Testing ' + type + ' Comparison', fontsize=font_size)
+        plt.ylabel(type + ' (%)', fontsize=font_size)
     if type == 'Loss':
-        plt.title('Training ' + type + ' Comparison', fontsize=14)
+        plt.title('Training ' + type + ' Comparison', fontsize=font_size)
+        plt.ylabel(type, fontsize=font_size)
 
     for numpy_path, config_path in zip(numpy_files, config_files):    
 
@@ -178,13 +180,13 @@ def plot_comparison_full_length(
         labels.append(config['exp_desc'])
         plt.plot(data[:, -1])
 
-    plt.legend(labels)
+    plt.legend(labels, fontsize=font_size, loc='lower left')
     plt.tight_layout()
 
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
-    plt.savefig(save_path + '/' + type.lower() + '.png')
+    plt.savefig(save_path + '/' +comparison_name + '_' + type.lower() + '.png')
     print(type + ' saved to file: ' + save_path)
     print()
 

@@ -8,6 +8,8 @@ import os
 import argparse
 import yaml
 import logging
+import random
+import itertools
 from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
@@ -119,16 +121,15 @@ else:
     model = load_model(config)
     algo = load_algo(model, config)
 
-    binary_tasks = [
-        (i, j) for i in range(config.num_classes) for j in range(i + 1, config.num_classes)
-    ]  # Generate binary tasks
-    binary_tasks = [binary_tasks[i] for i in torch.randperm(len(binary_tasks))]
-    binary_tasks = binary_tasks[:config.num_tasks]
+    random.seed(42)
+    all_combinations = list(itertools.product(list(range(config.num_classes)), repeat=2))
+    binary_tasks = [random.choice(all_combinations) for _ in range(config.num_tasks)]
 
     all_train_losses = []
     all_test_accuracies = []
 
     for task_idx, (class1, class2) in enumerate(binary_tasks):
+
         logging.info(f"\nStarting Binary Task {task_idx + 1}/{config.num_tasks}: Class {class1} vs Class {class2}")
         
         # Create binary datasets

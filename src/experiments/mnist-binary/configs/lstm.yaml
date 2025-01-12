@@ -3,7 +3,7 @@ model:
   model_type: "LSTM"
   input_size: 28
   hidden_size: 25        # Hidden size (used as embedding dimension)
-  num_classes: 2         # Binary classification
+  num_classes: 10         # Binary classification
 
 # Training Configuration
 training:
@@ -12,6 +12,7 @@ training:
   batch_size: 6000        # Batch size
   learning_rate: 0.01     # Learning rate
   num_tasks: 50        # Number of tasks to repeat
-
+  to_perturb: False
+  
 # Experiment Description
 exp_desc: "lstm"  # Experiment description

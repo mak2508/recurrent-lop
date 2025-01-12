@@ -47,6 +47,8 @@ You are ready to go!
 
 ## Running
 
+### Experiments
+
 Make sure to have access to a GPU in order to run at a reasonable pace. One way to do this is to sign into https://jupyter.euler.hpc.ethz.ch with GPU enabled and simply run this in a terminal instance here. Feel fre to change any configuration. The better way to do this is using srun/sbatch through ssh into ETH Euler cluster.
 
 To run a particular experiment localy, navigate to the experiment subfolder and run as follows:
@@ -80,6 +82,28 @@ chmod +x <exp-name>.sh
 ```
 
 Feel free to change any configuration setting in srun/sbatch, however, these are enough to run the files in reasonable speed. Running our bash scripts will run all config files for given experiment. Feel free to remove any of these configs if you want to speed up the process.
+
+### Comparison
+
+Once experiment are run, you can also plot comparison of accuracies and losses of different experiment configurations. Compare configurations are stored in src/compare/configs. There you can specifiy whether you want to compare accuracies or losses, or both. Also, you can specify which files to compare and their correspoding configs. Use our examples to guide you! To do this navigate to compare subfolder:
+
+```shell
+cd src/compare
+```
+
+There you can run:
+
+```shell
+python compare.py --config <config-file>.yaml
+```
+
+or
+
+```shell
+./compare.sh
+```
+
+Bare in mind that last method can run multiple compare configs at once too, as given by our example!
 
 ## Folder Structure
 Within the `src` folder, the code is broken up into the following folders.

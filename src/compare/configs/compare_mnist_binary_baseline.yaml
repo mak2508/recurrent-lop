@@ -1,0 +1,11 @@
+accuracy: True
+
+loss: True
+
+numpy_files:
+  - ./../experiments/mnist-binary/output/mnist_binary_mlp
+  - ./../experiments/mnist-binary/output/mnist_binary_lstm
+
+config_files:
+  - ./../experiments/mnist-binary/configs/mlp.yaml
+  - ./../experiments/mnist-binary/configs/lstm.yaml

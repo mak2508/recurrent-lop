@@ -1,0 +1,13 @@
+accuracy: True
+
+loss: True
+
+numpy_files:
+  - ./../experiments/lang-reshuffle/output/lang_reshuffle_gru_small
+  - ./../experiments/lang-reshuffle/output/lang_reshuffle_gru_medium
+  - ./../experiments/lang-reshuffle/output/lang_reshuffle_gru_large
+
+config_files:
+  - ./../experiments/lang-reshuffle/configs/gru_small.yaml
+  - ./../experiments/lang-reshuffle/configs/gru_medium.yaml
+  - ./../experiments/lang-reshuffle/configs/gru_large.yaml
