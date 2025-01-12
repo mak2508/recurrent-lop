@@ -181,6 +181,8 @@ def plot_comparison_full_length(
         plt.plot(data[:, -1])
 
     plt.legend(labels, fontsize=font_size, loc='lower left')
+    plt.xticks(fontsize=font_size-5)
+    plt.yticks(fontsize=font_size-5)
     plt.tight_layout()
 
     if not os.path.exists(save_path):
