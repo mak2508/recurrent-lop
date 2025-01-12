@@ -1,0 +1,11 @@
+accuracy: True
+
+loss: True
+
+numpy_files:
+  - ./../experiments/mnist-reshuffle/output/mnist_reshuffle_mlp_perturb
+  - ./../experiments/lang-reshuffle/output/lang_reshuffle_gru_l2
+
+config_files:
+  - ./../experiments/mnist-reshuffle/configs/mlp_perturb.yaml
+  - ./../experiments/lang-reshuffle/configs/gru_l2.yaml
