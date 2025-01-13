@@ -105,7 +105,9 @@ if args.compare:
     # Comparison mode: Handle multiple configs with consistent reshuffling
     results = {}
     reshuffling_runs = []
-    exp_descs = []  # List to store experiment descriptions for plot legends
+    exp_descs = []
+    all_train_losses = {}
+    all_test_accuracies = {}
 
     # Load first config to determine reshuffling parameters
     with open(args.config[0], 'r') as f:
@@ -131,18 +133,20 @@ if args.compare:
             config_dict = yaml.safe_load(f)
             config = Config.from_dict(config_dict)
 
-        exp_descs.append(config.exp_desc)  # Collect experiment descriptions
+        exp_descs.append(config.exp_desc)
 
         train_dataset, test_dataset, vocab_size = load_language_data(dataset_file, config)
         model = load_model(config)
         algo = load_algo(model, config)
 
+        run_train_losses = []
+        run_test_accuracies = []
         final_accuracies = []
+
         for run, (shuffled_train, shuffled_test) in enumerate(reshuffling_runs):
             logging.info(f"\nStarting Run {run + 1}/{base_config.num_tasks} for {config.exp_desc}")
             
-            # Reuse the pre-generated reshufflings
-            _, test_accuracies = train_model(
+            train_losses, test_accuracies = train_model(
                 algo=algo,
                 train_data=shuffled_train,
                 test_data=shuffled_test,
@@ -150,17 +154,24 @@ if args.compare:
                 device=config.device,
                 batch_size=config.batch_size
             )
-            final_accuracies.append(test_accuracies[-1])  # Collect final test accuracy
+            run_train_losses.append(train_losses)
+            run_test_accuracies.append(test_accuracies)
+            final_accuracies.append(test_accuracies[-1])
 
-        results[config.exp_desc] = final_accuracies  # Use exp_desc as key
+        all_train_losses[config.exp_desc] = run_train_losses
+        all_test_accuracies[config.exp_desc] = run_test_accuracies
+        results[config.exp_desc] = final_accuracies
 
-        # Save final accuracies for this configuration in the single output directory
-        final_accuracies_path = f'{output_dir}/{config.exp_desc}_final_accuracies.npy'
-        np.save(final_accuracies_path, np.array(final_accuracies))
-        logging.info(f"Saved final accuracies for {config.exp_desc} to {final_accuracies_path}")
+        # Save results for each config
+        np.save(f'{output_dir}/{config.exp_desc}_train_losses.npy', np.array(run_train_losses))
+        np.save(f'{output_dir}/{config.exp_desc}_test_accuracies.npy', np.array(run_test_accuracies))
 
     # Generate comparison plot with exp_descs as labels
     plot_comparison(results, exp_descs, output_dir)
+
+    # Save combined results for comparison
+    np.save(f'{output_dir}/all_train_losses.npy', all_train_losses)
+    np.save(f'{output_dir}/all_test_accuracies.npy', all_test_accuracies)
 else:
     # Single config mode: Original behavior
     with open(args.config[0], 'r') as f:
