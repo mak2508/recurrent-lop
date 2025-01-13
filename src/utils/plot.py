@@ -2,7 +2,7 @@ import os
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import List, Optional
+from typing import List, Dict, Optional
 
 def plot_results(
     all_train_losses: List[List[float]],
@@ -73,55 +73,60 @@ def plot_results(
 
 
 def plot_comparison(
-    results: dict,
-    config_files: list,
-    save_path: Optional[str] = None
-) -> None:
+    results: Dict[str, List[float]],
+    exp_descs: List[str],
+    save_path: Optional[str] = None,
+    comparison_name: str = "accuracy_comparison",
+):
     """
-    Plot line comparison of final accuracies across multiple configurations and save the output.
+    Plot all final accuracies across multiple configurations with exp_desc as labels.
 
     Args:
-        results (dict): Dictionary containing configuration names as keys and lists of final accuracies as values.
-        config_files (list): List of config file paths used as input.
+        results (dict): Dictionary containing experiment descriptions as keys and lists of accuracies as values.
+        exp_descs (list): List of experiment descriptions used as labels for the plot.
         save_path (str, optional): Path to save the figure. If None, the figure is not saved.
+        comparison_name (str): Name of the output file for the plot.
     """
-    # Use base filenames as labels
-    labels = [os.path.basename(config_file) for config_file in config_files]
+    print("Plotting comparison of accuracies.")
+    font_size = 25
 
-    # Check if all labels exist in results
-    for label in labels:
-        if label not in results:
-            raise KeyError(f"Config file '{label}' not found in results.")
-
-    # Create output directory if save_path is provided
+    # Create the save directory if needed
     if save_path:
         os.makedirs(save_path, exist_ok=True)
 
-    # Plot line comparison for each config
-    plt.figure(figsize=(12, 7))
-    for label in labels:
-        plt.plot(
-            results[label],
-            label=label,
-            marker='o',
-            linestyle='-',
-            linewidth=2,
-            markersize=6  # Set the marker size (default is 6, you can adjust this value)
-        )
+    # Initialize the plot
+    plt.figure(figsize=(15, 5))
+    plt.xlabel("Runs", fontsize=font_size)
+    plt.ylabel("Final Accuracy (%)", fontsize=font_size)
+    plt.title("Final Accuracy Comparison Across Configurations", fontsize=font_size)
 
-    plt.title("Comparison of Final Accuracies Across Configurations", fontsize=16)
-    plt.xlabel("Shuffle Index", fontsize=14)
-    plt.ylabel("Final Accuracy (%)", fontsize=14)
-    plt.legend(title="Configuration", fontsize=12)
+    # Plot each configuration's final accuracies
+    for exp_desc in exp_descs:
+        if exp_desc in results:
+            plt.plot(
+                range(1, len(results[exp_desc]) + 1),  # X-axis is the run index (1, 2, 3, ...)
+                results[exp_desc],
+                label=exp_desc,
+                linewidth=2  # Line width for visibility
+            )
+        else:
+            print(f"Warning: '{exp_desc}' not found in results. Skipping.")
+
+    # Configure legend and styling
+    plt.legend(fontsize=font_size - 5, loc="lower left")
+    plt.xticks(fontsize=font_size - 5)
+    plt.yticks(fontsize=font_size - 5)
     plt.grid(alpha=0.5)
-
-    # Save the plot as an image
-    if save_path:
-        plot_file = os.path.join(save_path, "line_comparison_plot.png")
-        plt.savefig(plot_file, format="png", dpi=300, bbox_inches="tight")
-
     plt.tight_layout()
-    #plt.show()
+
+    # Save the plot
+    if save_path:
+        plot_file = os.path.join(save_path, f"{comparison_name}.png")
+        plt.savefig(plot_file, format="png", dpi=300, bbox_inches="tight")
+        print(f"Plot saved to: {plot_file}")
+
+    # Optionally show the plot
+    # plt.show()
 
 
 def plot_comparison_full_length(
