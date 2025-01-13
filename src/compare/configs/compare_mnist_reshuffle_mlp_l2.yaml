@@ -1,0 +1,13 @@
+accuracy: True
+
+loss: True
+
+numpy_files:
+  - ./../experiments/mnist-reshuffle/output/mnist_reshuffle_mlp_l2_001
+  - ./../experiments/mnist-reshuffle/output/mnist_reshuffle_mlp_l2_005
+  - ./../experiments/mnist-reshuffle/output/mnist_reshuffle_mlp_l2_0001
+
+config_files:
+  - ./../experiments/mnist-reshuffle/configs/mlp_l2_001.yaml
+  - ./../experiments/mnist-reshuffle/configs/mlp_l2_005.yaml
+  - ./../experiments/mnist-reshuffle/configs/mlp_l2_0001.yaml

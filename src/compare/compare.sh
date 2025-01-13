@@ -2,6 +2,7 @@
 
 python compare.py --config ./configs/compare_mnist_binary_baseline.yaml
 
+python compare.py --config ./configs/compare_mnist_reshuffle_mlp_l2.yaml
 python compare.py --config ./configs/compare_mnist_reshuffle_mlp.yaml
 python compare.py --config ./configs/compare_mnist_reshuffle_lstm.yaml
 python compare.py --config ./configs/compare_mnist_reshuffle_baseline.yaml
