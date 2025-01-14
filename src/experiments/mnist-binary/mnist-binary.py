@@ -48,10 +48,8 @@ test_dataset = torchvision.datasets.MNIST(root='./data',
 
 if args.compare:
     # Comparison mode: Handle multiple configs
-    results = {}
     exp_descs = []  # List to store experiment descriptions for plotting
-    all_train_losses = {}
-    all_test_accuracies = {}
+    results = {}  # Dictionary to store final accuracies for each configuration
 
     # Create a single output directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -76,13 +74,15 @@ if args.compare:
             config = Config.from_dict(config_dict)
 
         exp_descs.append(config.exp_desc)  # Collect experiment descriptions
+        exp_output_dir = os.path.join(output_dir, config.exp_desc)
+        os.makedirs(exp_output_dir, exist_ok=True)  # Create folder for this experiment
 
         model = load_model(config)
         algo = load_algo(model, config)
 
         run_train_losses = []
         run_test_accuracies = []
-        final_accuracies = []
+        final_accuracies = []  # Track final accuracies for this configuration
 
         # Train on pre-generated binary tasks
         for task_idx, (class1, class2) in enumerate(binary_tasks):
@@ -104,26 +104,17 @@ if args.compare:
 
             run_train_losses.append(train_losses)
             run_test_accuracies.append(test_accuracies)
-            final_accuracies.append(test_accuracies[-1])
+            final_accuracies.append(test_accuracies[-1])  # Save the final accuracy for this task
 
-        # Save results for this configuration
-        all_train_losses[config.exp_desc] = run_train_losses
-        all_test_accuracies[config.exp_desc] = run_test_accuracies
-        results[config.exp_desc] = final_accuracies
+        results[config.exp_desc] = final_accuracies  # Save final accuracies for this configuration
 
         # Save train losses and test accuracies for the current configuration
-        np.save(f'{output_dir}/{config.exp_desc}_train_losses.npy', np.array(run_train_losses))
-        np.save(f'{output_dir}/{config.exp_desc}_test_accuracies.npy', np.array(run_test_accuracies))
+        np.save(os.path.join(exp_output_dir, 'train_losses.npy'), np.array(run_train_losses))
+        np.save(os.path.join(exp_output_dir, 'test_accuracies.npy'), np.array(run_test_accuracies))
+        logging.info(f"Saved results for {config.exp_desc} in {exp_output_dir}")
 
-        logging.info(f"Saved train and test accuracies for {config.exp_desc}")
-
-    # Generate comparison plot
+    # Generate comparison plot using results
     plot_comparison(results, exp_descs, output_dir)
-
-    # Save combined results for all configurations
-    np.save(f'{output_dir}/all_train_losses.npy', all_train_losses)
-    np.save(f'{output_dir}/all_test_accuracies.npy', all_test_accuracies)
-
 
 else:
     # Single config mode: Original behavior

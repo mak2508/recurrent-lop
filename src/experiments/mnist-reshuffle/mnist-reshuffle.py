@@ -46,11 +46,9 @@ test_dataset = torchvision.datasets.MNIST(root='./data/',
 
 if args.compare:
     # Comparison mode: Handle multiple configs with consistent reshuffling
-    results = {}
-    reshuffling_runs = []
     exp_descs = []
-    all_train_losses = {}
-    all_test_accuracies = {}
+    reshuffling_runs = []
+    results = {}  # Add results dictionary to store final accuracies for each configuration
 
     # Load the first config to determine reshuffling parameters
     with open(args.config[0], 'r') as f:
@@ -75,13 +73,15 @@ if args.compare:
             config = Config.from_dict(config_dict)
 
         exp_descs.append(config.exp_desc)
+        exp_output_dir = os.path.join(output_dir, config.exp_desc)
+        os.makedirs(exp_output_dir, exist_ok=True)  # Create a folder for this configuration
 
         model = load_model(config)
         algo = load_algo(model, config)
 
         run_train_losses = []
         run_test_accuracies = []
-        final_accuracies = []
+        final_accuracies = []  # Track final accuracies for the current config
 
         for run, (shuffled_train, shuffled_test) in enumerate(reshuffling_runs):
             logging.info(f"\nStarting Run {run + 1}/{base_config.num_tasks} for {config.exp_desc}")
@@ -96,22 +96,17 @@ if args.compare:
             )
             run_train_losses.append(train_losses)
             run_test_accuracies.append(test_accuracies)
-            final_accuracies.append(test_accuracies[-1])
+            final_accuracies.append(test_accuracies[-1])  # Append the final accuracy for this run
 
-        all_train_losses[config.exp_desc] = run_train_losses
-        all_test_accuracies[config.exp_desc] = run_test_accuracies
-        results[config.exp_desc] = final_accuracies
+        results[config.exp_desc] = final_accuracies  # Store final accuracies in the results dictionary
 
         # Save results for this configuration
-        np.save(f'{output_dir}/{config.exp_desc}_train_losses.npy', np.array(run_train_losses))
-        np.save(f'{output_dir}/{config.exp_desc}_test_accuracies.npy', np.array(run_test_accuracies))
+        np.save(os.path.join(exp_output_dir, 'train_losses.npy'), np.array(run_train_losses))
+        np.save(os.path.join(exp_output_dir, 'test_accuracies.npy'), np.array(run_test_accuracies))
+        logging.info(f"Results saved for {config.exp_desc} in {exp_output_dir}")
 
-    # Generate comparison plot with exp_descs as labels
+    # Generate comparison plot using results
     plot_comparison(results, exp_descs, output_dir)
-
-    # Save combined results for comparison
-    np.save(f'{output_dir}/all_train_losses.npy', all_train_losses)
-    np.save(f'{output_dir}/all_test_accuracies.npy', all_test_accuracies)
 
 else:
     # Single config mode: Original behavior with preloaded reshufflings
