@@ -34,10 +34,16 @@ def compare_configs(
         print(f"Error: Failed to parse YAML file. {e}")
 
     if config['accuracy']:
-        plot_comparison_full_length(config['numpy_files'], config['config_files'], 'Accuracy', config_name)
+        if 'labels' in config:
+            plot_comparison_full_length(config['numpy_files'], config['config_files'], 'Accuracy', config_name, config['labels'])
+        else:
+            plot_comparison_full_length(config['numpy_files'], config['config_files'], 'Accuracy', config_name)
     
     if config['loss']:
-        plot_comparison_full_length(config['numpy_files'], config['config_files'], 'Loss', config_name)
+        if 'labels' in config:
+            plot_comparison_full_length(config['numpy_files'], config['config_files'], 'Loss', config_name, config['labels'])
+        else:
+            plot_comparison_full_length(config['numpy_files'], config['config_files'], 'Loss', config_name)
     
 
 if __name__ == "__main__":

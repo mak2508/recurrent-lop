@@ -13,3 +13,9 @@ config_files:
   - ./../experiments/lang-reshuffle/configs/gru_l2.yaml
   - ./../experiments/lang-reshuffle/configs/gru_perturb.yaml
   - ./../experiments/lang-reshuffle/configs/gru_cbp.yaml
+
+labels:
+  "gru_reshuffle_medium" : "gru"
+  "gru_reshuffle_l2" : "gru_l2"
+  "gru_reshuffle_perturb" : "gru_perturb"
+  "gru_reshuffle_cbp" : "gru_cbp"
