@@ -133,7 +133,8 @@ def plot_comparison_full_length(
     numpy_files: List[str],
     config_files: List[str],
     type: str,
-    comparison_name: str
+    comparison_name: str,
+    labels_map: Optional[Dict[str, str]] = {}
 ):
     """
     Plots a comparison of accuracy/loss of last epoch during each experiments given the configuration files.
@@ -142,6 +143,7 @@ def plot_comparison_full_length(
         numpy_files (List[str]): A list of paths to NumPy files containing the data to be plotted.
         config_paths (List[str]): A list of paths to YAML configuration files providing additional settings.
         type (str): The type of comparison to perform (e.g., "line", "bar", "scatter").
+        labels_map (Dict[str, str]): A dictionary of labels for the experiments mapping original label to new label.
     """
     
     print(type + ' plotting.')
@@ -182,7 +184,7 @@ def plot_comparison_full_length(
         except yaml.YAMLError as e:
             print(f"Error: Failed to parse YAML file. {e}")
 
-        labels.append(config['exp_desc'])
+        labels.append(labels_map.get(config['exp_desc'], config['exp_desc']))
         plt.plot(data[:, -1])
 
     plt.legend(labels, fontsize=font_size, loc='lower left')
