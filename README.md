@@ -49,9 +49,9 @@ You are ready to go!
 
 ### Experiments
 
-Make sure to have access to a GPU in order to run at a reasonable pace. One way to do this is to sign into https://jupyter.euler.hpc.ethz.ch with GPU enabled and simply run this in a terminal instance here. Feel fre to change any configuration. The better way to do this is using srun/sbatch through ssh into ETH Euler cluster.
+Make sure to have access to a GPU in order to run at a reasonable pace. One way to do this is to sign into https://jupyter.euler.hpc.ethz.ch with GPU enabled and simply run this in a terminal instance here. Feel free to change any configuration. The better way to do this is using srun/sbatch through ssh into ETH Euler cluster.
 
-To run a particular experiment localy, navigate to the experiment subfolder and run as follows:
+To run a particular experiment locally, navigate to the experiment subfolder and run as follows:
 
 ```shell
 python <exp-name>.py --config <config-path>
@@ -63,7 +63,13 @@ or
 ./<exp-name>.sh
 ```
 
-If you are using remote machine, such as ETH Euler cluster, you should use our bash scripts too:
+If you want to run multiple configurations with the same experiment rounds for the same task, you can use the `--compare` flag as follows:
+
+```shell
+python <exp-name>.py --compare --config <config-path-1> <config-path-2> ...
+```
+
+If you are using a remote machine, such as ETH Euler cluster, you should use our bash scripts too:
 
 ```shell
 srun --time=8:00:00 --gpus=1 --gres=gpumem:8g --mem-per-cpu=16g <exp-name>.sh
@@ -75,17 +81,17 @@ or
 sbatch --time=8:00:00 --gpus=1 --gres=gpumem:8g --mem-per-cpu=16g <exp-name>.sh
 ```
 
-If you encounter permission error, you can run:
+If you encounter a permission error, you can run:
 
 ```shell
 chmod +x <exp-name>.sh
 ```
 
-Feel free to change any configuration setting in srun/sbatch, however, these are enough to run the files in reasonable speed. Running our bash scripts will run all config files for given experiment. Feel free to remove any of these configs if you want to speed up the process.
+Feel free to change any configuration setting in srun/sbatch, however, these are enough to run the files in reasonable speed. Running our bash scripts will run all config files for a given experiment. Feel free to remove any of these configs if you want to speed up the process.
 
 ### Comparison
 
-Once experiment are run, you can also plot comparison of accuracies and losses of different experiment configurations. Compare configurations are stored in src/compare/configs. There you can specifiy whether you want to compare accuracies or losses, or both. Also, you can specify which files to compare and their correspoding configs. Use our examples to guide you! To do this navigate to compare subfolder:
+Once experiments are run, you can also plot a comparison of accuracies and losses of different experiment configurations. Compare configurations are stored in `src/compare/configs`. There you can specify whether you want to compare accuracies or losses, or both. Also, you can specify which files to compare and their corresponding configs. Use our examples to guide you! To do this navigate to the compare subfolder:
 
 ```shell
 cd src/compare
