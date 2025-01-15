@@ -16,7 +16,6 @@ training:
   batch_size: 128        # Batch size
   learning_rate: 0.1     # Learning rate
   num_tasks: 100         # Number of tasks to repeat
-  num_shuffles: 150      # Number of tasks to repeat with shuffling
 
 # Dataset Configuration
 languages: [
@@ -29,4 +28,4 @@ test_sentences_per_class: 400
 sentences_per_class: 3000  # Combined train + test
 
 # Experiment Description
-exp_desc: "gru_binary_base"  # Experiment description
+exp_desc: "gru_binary_cbp"  # Experiment description
