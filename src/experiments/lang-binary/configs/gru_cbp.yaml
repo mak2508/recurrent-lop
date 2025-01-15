@@ -1,1 +1,32 @@
+# Model Configuration
+model:
+  model_type: "GRU"
+  input_size: 10000      # Vocabulary size (input dimension)
+  hidden_size: 64        # Hidden size (used as embedding dimension)
+  num_layers: 1          # Number of GRU layers
+  num_classes: 2         # Binary classification
+  vocab_limit: 10000     # Vocabulary limit (maximum number of words in the vocabulary)
+  max_length: 50         # Maximum sequence length
+  dropout_rate: 0.0      # Dropout rate for regularization
 
+# Training Configuration
+training:
+  algo: "CBP_GRU"        # Training algorithm (Cont Backprop)
+  num_epochs: 30         # Number of epochs
+  batch_size: 128        # Batch size
+  learning_rate: 0.1     # Learning rate
+  num_tasks: 100         # Number of tasks to repeat
+  num_shuffles: 150      # Number of tasks to repeat with shuffling
+
+# Dataset Configuration
+languages: [
+    'spa', 'por', 'ita', 'fra', 'ron', 'deu', 'swe', 'rus', 'hin', 'ara',
+    'jpn', 'kor', 'tur', 'nld', 'ell', 'pol', 'ukr', 'ces', 'heb', 'cmn',
+] # List of languages
+
+train_sentences_per_class: 2600
+test_sentences_per_class: 400
+sentences_per_class: 3000  # Combined train + test
+
+# Experiment Description
+exp_desc: "gru_binary_base"  # Experiment description
