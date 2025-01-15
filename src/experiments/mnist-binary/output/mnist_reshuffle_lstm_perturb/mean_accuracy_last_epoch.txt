@@ -1,0 +1,1 @@
+Mean Accuracy (Last Epoch): 91.1536
