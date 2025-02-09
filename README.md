@@ -2,6 +2,20 @@
 
 This repository explores [Loss of Plasticity](https://www.nature.com/articles/s41586-024-07711-7) in Recurrent Neural Networks. All experiments we propose have their correspoding output already generated, However, if you want to run them for yourself we will guide you thorugh the process!
 
+## Report
+
+You can find our project report writeup on the class OpenReview console [here](https://openreview.net/forum?id=0mXNceVrV2&referrer=%5BAuthor%20Console%5D(%2Fgroup%3Fid%3DETHz.ch%2F2024%2FCourse%2FDL_Reports_Early_Deadline%2FAuthors%23your-submissions)).
+
+The project proposal is available [here](https://openreview.net/forum?id=HB0myU9MTK&referrer=%5BAuthor%20Console%5D(%2Fgroup%3Fid%3DETHz.ch%2F2024%2FCourse%2FDL_Early_Deadline%2FAuthors%23your-submissions)).
+
+## Folder Structure
+Within the `src` folder, the code is broken up into the following folders.
+
+- `experiments`: This contains a separate subfolder for each of the experiments we run. More details on each experiment are provided in correspoding `README` files in each of the subfolders.
+- `nets`: This contains all the different network architectures we use in our experiments. This can easily be extended by adding another file here.
+- `algos`: This folder contains different learning algorithms, such as backpropagation and continual backpropagation.
+- `utils`: Here we have several useful functionalities that are reused throughout the repository.
+
 ## Usage
 
 ### Setting up
@@ -111,15 +125,7 @@ or
 
 Bare in mind that last method can run multiple compare configs at once too, as given by our example!
 
-## Folder Structure
-Within the `src` folder, the code is broken up into the following folders.
-
-- `experiments`: This contains a separate subfolder for each of the experiments we run. More details on each experiment are provided in correspoding `README` files in each of the subfolders.
-- `nets`: This contains all the different network architectures we use in our experiments. This can easily be extended by adding another file here.
-- `algos`: This folder contains different learning algorithms, such as backpropagation and continual backpropagation.
-- `utils`: Here we have several useful functionalities that are reused throughout the repository.
-
-## Experiment Structure
+### Experiment Config Structure
 Each experiment is setup as a python script that reads a config file as input with the specifications of its experiments. Below is a sample config file for the `mnist-reshuffle` task:
 
 ```yaml
