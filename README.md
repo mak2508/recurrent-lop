@@ -4,9 +4,7 @@ This repository explores [Loss of Plasticity](https://www.nature.com/articles/s4
 
 ## Report
 
-You can find our project report writeup on the class OpenReview console [here](https://openreview.net/forum?id=0mXNceVrV2&referrer=%5BAuthor%20Console%5D(%2Fgroup%3Fid%3DETHz.ch%2F2024%2FCourse%2FDL_Reports_Early_Deadline%2FAuthors%23your-submissions)).
-
-The project proposal is available [here](https://openreview.net/forum?id=HB0myU9MTK&referrer=%5BAuthor%20Console%5D(%2Fgroup%3Fid%3DETHz.ch%2F2024%2FCourse%2FDL_Early_Deadline%2FAuthors%23your-submissions)).
+You can find our project report writeup in the reposity in the file `report.pdf`.
 
 ## Folder Structure
 Within the `src` folder, the code is broken up into the following folders.
